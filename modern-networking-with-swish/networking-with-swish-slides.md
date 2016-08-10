@@ -10,12 +10,17 @@ build-lists: true
 
 ![100%](assets/thoughtbot-logo.png)
 
+^ consulting company of designers and developers who'll work with you to build
+  a great product. TODO make sure this the summary on the site
+
 ---
 
 ![right 40%](assets/argo-logo.png)
 
 # [fit] Argo
 ## [fit] Functional JSON parsing library
+
+^ Not Swish requirement, but recommended.
 
 ---
 
@@ -24,7 +29,8 @@ build-lists: true
 # [fit] Swish
 ## [fit] Nothing but net(working)
 
-^ Provides an API around `NSURLRequest`
+^ Provides an API around `NSURLRequest` to build requests. Entirely value type
+  and protocol based.
 
 ---
 
@@ -34,21 +40,22 @@ build-lists: true
 struct Comment {
   let id: Int
   let text: String
-  let username: String
+  let user: String
 }
 
 extension Comment: Decodable {
+  // Assume: { "id": 1, "commentText": "Hello world", "user": "ralph" }
   static func decode(json: JSON) -> Decoded<Comment> {
     return curry(Comment.init)
       <^> json <| "id"
       <*> json <| "commentText"
-      <*> json <| "username"
+      <*> json <| "user"
   }
 }
 ```
 
 ^ Gloss over Argo syntax, assume when given JSON, this will return a `Comment`
-^ TOOD: reference Argo article?
+  TODO: reference Argo article, footer?
 
 ---
 
@@ -61,7 +68,9 @@ struct CommentRequest: Request {
   let id: Int
 
   func build() -> NSURLRequest {
-    let url = NSURL(string: "https://www.example.com/comments/\(id)")!
+    let url = NSURL(
+      string: "https://www.example.com/comments/\(id)"
+    )!
     return NSURLRequest(URL: url)
   }
 }
@@ -74,16 +83,16 @@ struct CommentRequest: Request {
 ```swift
 let request = CommentRequest(id: 1)
 
-APIClient().performRequest(request) { (result: Result<Comment, SwishError>) in
-  switch result {
+APIClient().performRequest(request) { result in
+  switch result { // Result<Comment, SwishError>
   case let .Success(comment):
-    print("Here's the comment: \(value)")
+    print("Here's the comment: \(comment)")
   case let .Failure(error):
     print("Oh no, an error: \(error)")
   }
 }
 
-// => Comment(id: 1, text: "I want to learn about Swish.", username: "ralph")
+// => Comment(id: 1, text: "Hi", user: "ralph")
 ```
 
 ---
@@ -100,13 +109,10 @@ struct CreateCommentRequest: Request {
   typealias ResponseObject = Comment
 
   let text: String
-  let username: String
+  let user: String
 
   var jsonPayload: [String: AnyObject] {
-    return [
-      "text": text,
-      "username": username
-    ]
+    return ["text": text, "user": user]
   }
 
   func build() -> NSURLRequest {
@@ -123,10 +129,10 @@ struct CreateCommentRequest: Request {
 # Executing the POST Request
 
 ```swift
-let request = CreateCommentRequest(text: "I'm learning!", username: "ralph")
+let request = CreateCommentRequest(text: "Hola", user: "ralph")
 
-APIClient().performRequest(request) { (result: Result<Comment, SwishError>) in
-  switch result {
+APIClient().performRequest(request) { result in
+  switch result { // Result<Comment, SwishError>
   case let .Success(comment):
     print("Here's the comment: \(value)")
   case let .Failure(error):
@@ -134,23 +140,22 @@ APIClient().performRequest(request) { (result: Result<Comment, SwishError>) in
   }
 }
 
-// => Comment(id: 2, text: "I'm learning!", username: "ralph")
+// => Comment(id: 2, text: "Hola", user: "ralph")
 ```
 
 ---
 
-# 🤔
-## Still easy.
+# :cool: 😎 
 
 ---
 
 # Comparison
 
 ```swift
-let request = CommentRequest(id: 1)
+let request = CommentRequest(/* ... */)
 
-APIClient().performRequest(request) { (result: Result<Comment, SwishError>) in
-  switch result {
+APIClient().performRequest(request) { result in
+  switch result { // Result<Comment, SwishError>
   case let .Success(comment):
     print("Here's the comment: \(value)")
   case let .Failure(error):
@@ -164,10 +169,10 @@ APIClient().performRequest(request) { (result: Result<Comment, SwishError>) in
 # Comparison
 
 ```swift
-let request = CreateCommentRequest(text: "I'm learning!", username: "ralph")
+let request = CreateCommentRequest(/* ... */)
 
-APIClient().performRequest(request) { (result: Result<Comment, SwishError>) in
-  switch result {
+APIClient().performRequest(request) { result in
+  switch result { // Result<Comment, SwishError>
   case let .Success(comment):
     print("Here's the comment: \(value)")
   case let .Failure(error):
@@ -193,7 +198,7 @@ protocol Decodable {
 ```
 
 ^ TODO: Is associated type inference being removed?
-^ TODO: Why the `Self` thing?
+  TODO: Why the `Self` thing?
 
 ---
 
@@ -210,7 +215,7 @@ extension Comment: Decodable {
     return curry(Comment.init)
       <^> json <| "id"
       <*> json <| "commentText"
-      <*> json <| "username"
+      <*> json <| "user"
   }
 }
 ```
@@ -238,7 +243,7 @@ protocol Request {
 ```
 
 ^ TODO: Does Swish comes with other parsers?
-^ Swish extends Argo's JSON type for default `Parser`
+  Swish extends Argo's JSON type for default `Parser`
 
 ---
 
@@ -295,20 +300,20 @@ it("points to /comments/:id") {
 # Testing Creating a Comment
 
 ```swift
-itBehavesLike(.POSTRequest, request: CreateCommentRequest(text: "", username: ""))
+itBehavesLike(.POSTRequest, request: CreateCommentRequest(text: "", user: ""))
 
 it("points to /comments") {
-  let request = CreateCommentRequest(text: "", username: "")
+  let request = CreateCommentRequest(text: "", user: "")
 
   expect(request.build()).to(hitEndpoint("/comments"))
 }
 
-it("has a payload with the text and username") {
-  let request = CreateCommentRequest(text: "Hi!", username: "ralph")
+it("has a payload with the text and user") {
+  let request = CreateCommentRequest(text: "Hi!", user: "ralph")
 
   expect(request.build()).to(havePayload([
     "text": "Hi!",
-    "username": "ralph"
+    "user": "ralph"
   ]))
 }
 ```
@@ -316,6 +321,8 @@ it("has a payload with the text and username") {
 ---
 
 # What else can you do with Swish?
+
+^ double-tap next to get to first bullet point
 
 ---
 
