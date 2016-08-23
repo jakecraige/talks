@@ -117,6 +117,19 @@ struct CreateCommentRequest: Request {
   }
 
   func build() -> NSURLRequest {
+    // ...
+  }
+}
+```
+
+---
+
+# Building a POST Request
+
+```swift
+struct CreateCommentRequest: Request {
+  // ...
+  func build() -> NSURLRequest {
     let url = NSURL(string: "https://www.example.com/comments")!
     let request = NSMutableURLRequest(URL: url)
     request.HTTPMethod = "POST"
@@ -281,6 +294,23 @@ it("has a payload with the text and user") {
     "text": "Hi!",
     "user": "ralph"
   ]))
+}
+```
+
+---
+
+# Stubbing the Network
+
+```swift
+it("completes the full request cycle") {
+  let request = CommentRequest(id: 1)
+  stub(request).with(.comment)
+
+  var response: Comment? = .None
+  APIClient().performRequest(request) { response = $0.value }
+
+  expect(response)
+    .toEventually(equal(Comment(id: 1, text: "Hallo", user: "ralph")))
 }
 ```
 
