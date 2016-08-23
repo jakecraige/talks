@@ -3,15 +3,17 @@ build-lists: true
 # Modern Networking with Swish
 ### @jakecraige
 
-^ Tell story about what we're going to do, request and create comments, and test
-  them
+^ Better titled, "Networking with Swish", but that didn't sound as cool.
+  Why? Huge WebService class, DRY, testability, composability
+  What? We're going create a request to retrieve comments, create them, and test
+  them.
 
 ---
 
 ![100%](assets/thoughtbot-logo.png)
 
-^ consulting company of designers and developers who'll work with you to build
-  a great product. TODO make sure this the summary on the site
+^ consulting company of designers and developers who'll partner with you to create
+  great products for web and mobile.
 
 ---
 
@@ -55,7 +57,6 @@ extension Comment: Decodable {
 ```
 
 ^ Gloss over Argo syntax, assume when given JSON, this will return a `Comment`
-  TODO: reference Argo article, footer?
 
 ---
 
@@ -118,6 +119,9 @@ struct CreateCommentRequest: Request {
   func build() -> NSURLRequest {
     let url = NSURL(string: "https://www.example.com/comments")!
     let request = NSMutableURLRequest(URL: url)
+    request.HTTPMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Accept")
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.jsonPayload = jsonPayload
     return request
   }
@@ -149,41 +153,6 @@ APIClient().performRequest(request) { result in
 
 ---
 
-# Comparison
-
-```swift
-let request = CommentRequest(/* ... */)
-
-APIClient().performRequest(request) { result in
-  switch result { // Result<Comment, SwishError>
-  case let .Success(comment):
-    print("Here's the comment: \(value)")
-  case let .Failure(error):
-    print("Oh no, an error: \(error)")
-  }
-}
-```
-
----
-
-# Comparison
-
-```swift
-let request = CreateCommentRequest(/* ... */)
-
-APIClient().performRequest(request) { result in
-  switch result { // Result<Comment, SwishError>
-  case let .Success(comment):
-    print("Here's the comment: \(value)")
-  case let .Failure(error):
-    print("Oh no, an error: \(error)")
-  }
-}
-```
-
-
----
-
 ## Let's break it down 💃
 
 ---
@@ -197,8 +166,8 @@ protocol Decodable {
 }
 ```
 
-^ TODO: Is associated type inference being removed?
-  TODO: Why the `Self` thing?
+^ `Self` because when using `Self`, subclasses don't know what to return. More
+  discussion in a thread linked in resources.
 
 ---
 
@@ -220,8 +189,6 @@ extension Comment: Decodable {
 }
 ```
 
-^ TODO: Is associated type inference being removed?
-
 ---
 
 # Swish's `Request`
@@ -242,8 +209,7 @@ protocol Request {
 }
 ```
 
-^ TODO: Does Swish comes with other parsers?
-  Swish extends Argo's JSON type for default `Parser`
+^ Swish extends Argo's JSON type for default `Parser`
 
 ---
 
@@ -276,8 +242,8 @@ struct CommentRequest: Request {
 
 # Testing
 
-^ TODO: Helpers defined in a gist.
-  We use Quick and Nimble.
+^ Helpers defined in a gist linked in resources.
+  We use Quick, Nimble, and Nocilla.
   Because we're able to build up a request without executing it, it's easy to
   build it in test and make assertions against it.
 
