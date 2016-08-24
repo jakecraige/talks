@@ -324,6 +324,7 @@ it("completes the full request cycle") {
 
 # What else can you do with Swish?
 
+1. Dependency injection of `APIClient`, protocol `Client`, for testing
 1. Cancel in-flight requests
 1. Execute requests on different queues.
 1. Support arbitrary JSON parsers or response types.
