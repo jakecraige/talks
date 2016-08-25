@@ -3,10 +3,9 @@ build-lists: true
 # Modern Networking with Swish
 ### @jakecraige
 
-^ Better titled, "Networking with Swish", but that didn't sound as cool.
-  Why? Huge WebService class, DRY, testability, composability
-  What? We're going create a request to retrieve comments, create them, and test
-  them.
+^ Why? Huge WebService class, massive VCs, broad interface, hard to understand and test
+  What? We're going create a request to retrieve comments, create them, and test them. Similar to Swift Talk on objc.io
+  Promise link to resources at end.
 
 ---
 
@@ -255,8 +254,7 @@ struct CommentRequest: Request {
 
 # Testing
 
-^ Helpers defined in a gist linked in resources.
-  We use Quick, Nimble, and Nocilla.
+^ We use Quick, Nimble, and Nocilla.
   Because we're able to build up a request without executing it, it's easy to
   build it in test and make assertions against it.
 
@@ -273,6 +271,8 @@ it("points to /comments/:id") {
   expect(request.build()).to(hitEndpoint("/comments/1"))
 }
 ```
+
+^ Story about GET request headers failing
 
 ---
 
@@ -296,6 +296,9 @@ it("has a payload with the text and user") {
   ]))
 }
 ```
+
+^ Tip: Defining an "Authenticated" request
+  Tip: Story about wrapping name in "0"s
 
 ---
 
@@ -328,15 +331,15 @@ it("completes the full request cycle") {
 1. Cancel in-flight requests
 1. Execute requests on different queues.
 1. Support arbitrary JSON parsers or response types.
-1. Anything you want. 
+1. Anything you want.
 
 ^ Swish is implemented with exclusively value types and protocols which makes it
   _completely_ pluggable.
 
 ---
 
-# Thanks. Questions?
+# Thanks y'all. Questions?
 
-- [https://tbot.io/swish-talk]()
+- [https://tbot.io/swish-talk](https://tbot.io/swish-talk)
 - @jakecraige
 
