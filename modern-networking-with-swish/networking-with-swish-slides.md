@@ -11,7 +11,8 @@ build-lists: true
 
 ![100%](assets/thoughtbot-logo.png)
 
-^ consulting company of designers and developers who'll partner with you to create
+^ This is Ralph.
+  consulting company of designers and developers who'll partner with you to create
   great products for web and mobile.
 
 ---
@@ -249,6 +250,28 @@ struct CommentRequest: Request {
 ```
 
 ^ Notice no `parse` implementation
+
+---
+
+# Swish `Request.parse`
+
+```swift
+struct CommentRequest: Request {
+  typealias ResponseObject = Comment
+
+  let id: Int
+
+  func build() -> NSURLRequest {
+    let url = NSURL(string: "https://www.example.com/comments/\(id)")!
+    return NSURLRequest(URL: url)
+  }
+
+  func parse(j: JSON) -> Result<Comment, SwishError> {
+    return .fromDecoded(Comment.decode(j)) // Default
+    return .fromDecoded(j <| "comment") // Root key
+  }
+}
+```
 
 ---
 
